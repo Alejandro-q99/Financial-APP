@@ -10,7 +10,7 @@ class BonosSpider(scrapy.Spider):
     def parse(self, response):
         for row in response.xpath('//table/tbody/tr'):
             item = BonosItem()
-            item['ticker'] = row.xpath('.//td[1]/a/text()').get()
+            item['ticker'] = row.xpath('.//td[@id="ticker"]/a/text()').get()
             item['indice'] = row.xpath('.//td[2]/text()').get()
             item['precio'] = row.xpath('.//td[4]/span/text()').get()
             item['diferencia'] = row.xpath('.//td[5]/span/text()').get()
