@@ -23,8 +23,8 @@ P
 
 - In order to run the the scrapper we most to run the current spiders.
 
-  - `scrapy crawl bonos -o bonos.json`
-  - `scrapy crawl bonos -o bonos.csv`
+  - `scrapy crawl bonos -o app/Data/bonos.json`
+  - `scrapy crawl bonos -o app/Data/bonos.csv`
 
 -------------------
 ## ANALISIS REQUISITOS
