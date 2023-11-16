@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from Functions import Processors as pr
 from Functions import AutomatedGit as ag
-
+from datetime import datetime
 
 #read
 url = 'https://raw.githubusercontent.com/Alejandro-q99/Financial-APP/main/app/Data/bonos.csv'
