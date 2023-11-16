@@ -17,6 +17,8 @@ df_cleaned = cleaned_data.drop("diferencia", axis=1)
 
 # Ejecutar Scraper
 # Boton.
+
+# 
 ag.git_add_commit_push("Update + {datetime.now}")
 
 
