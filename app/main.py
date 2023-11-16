@@ -14,6 +14,7 @@ cleaned_data = pr.clean_and_convert_data(df)
 df_cleaned = cleaned_data.drop("diferencia", axis=1)
 
 
+
 ag.git_add_commit_push("Update + {datetime.now}")
 
 
