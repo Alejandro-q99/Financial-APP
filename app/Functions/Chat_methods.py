@@ -1,7 +1,18 @@
 
 import openai
+import os
+from dotenv import load_dotenv
+from pathlib import Path
 
-openai.api_key = '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'
+
+
+# Construimos la ruta absoluta para que me saque las keys de la carpeta.
+env_path = Path('..') / '..' / 'keys' / '.env'
+load_dotenv(dotenv_path=env_path.resolve())
+api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = api_key 
+
+
 
 
 # Function to send a message to the OpenAI chatbot model and return its response
