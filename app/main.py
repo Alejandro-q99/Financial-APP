@@ -6,7 +6,7 @@ from Functions import Processors as pr
 from Functions import Chat_methods as ch
 from datetime import datetime
 import os
-
+from Models import Assistant as assi
 
 #read
 url = 'https://raw.githubusercontent.com/Alejandro-q99/Financial-APP/main/app/Data/bonos.csv'
@@ -67,6 +67,25 @@ with st.sidebar:
         else:
             st.success('Proceed to entering your prompt message!', icon='👉')
     os.environ['OPENAI_API_KEY'] = open_api
+    
+    
+    
+
+#Store LLM generated responses
+#if "messages" not in st.session_state.keys():
+#    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+
+# Display or clear chat messages
+#for message in st.session_state.messages:
+#    with st.chat_message(message["role"]):
+#        st.write(message["content"])
+
+
+
+def clear_chat_history():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+
 
 
 
@@ -78,15 +97,19 @@ def main():
 
     # Registro de mensajes de la conversación
     if 'message_log' not in st.session_state:
-        st.session_state['message_log'] = [{"role": "system", "content": "You are a helpful assistant."}]
+        st.session_state['message_log'] = [{"role": "system", "content": f"You are a helpful assistant, with {metadata} and {df_cleaned} as reference"}]
 
     # Campo de entrada para el mensaje del usuario
     user_input = st.text_input("Preguntale por tus datos aquí!:")
-
+    
+    
+    
+    
     # Botón de enviar
     if st.button('Enviar'):
         st.session_state['message_log'].append({"role": "user", "content": user_input})
-        response = ch.send_message(st.session_state['message_log'])
+        #response = ch.send_message(st.session_state['message_log'])
+        response = assi.model_t5(st.session_state['message_log'])
         st.session_state['message_log'].append({"role": "assistant", "content": response})
         st.write(response)
 
