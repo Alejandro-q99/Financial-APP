@@ -173,3 +173,23 @@ https://open.bymadata.com.ar/#/dashboard
 
 
 ________
+
+
+
+## META ANALYSISI DE LAS COLUMNAS
+
+
+Diferencia (diferencia)
+Días al vencimiento (dq)
+Índice (indice)
+Margen de dispersión (md)
+Paridad (paridad)
+Precio de corte (pq)
+Precio (precio)
+Porcentaje de cobertura (qp)
+Ticker (ticker)
+Tasa interna de retorno (tir)
+Tasa total interna de retorno (ttir)
+Tasa única total interna de retorno (uptir)
+Volumen (volumen)
+Volumen total (vt)
