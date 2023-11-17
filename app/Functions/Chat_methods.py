@@ -7,10 +7,10 @@ import streamlit as st
 import toml
 
 
-secrets = toml.load("secrets.toml")
-api_key = secrets["default"]["OPENAI_API_KEY"]
+#secrets = toml.load("secrets.toml")
+#api_key = secrets["default"]["OPENAI_API_KEY"]
 
-
+openai.api_key = st.secrets["default"]["OPENAI_API_KEY"]
 
 
 # Function to send a message to the OpenAI chatbot model and return its response

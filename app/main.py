@@ -5,6 +5,7 @@ import numpy as np
 from Functions import Processors as pr
 from Functions import Chat_methods as ch
 from datetime import datetime
+import os
 
 
 #read
@@ -18,7 +19,7 @@ df_cleaned = cleaned_data
 
 
 
-st.title("BONOS")
+st.title("BONOS TASA FIJA - BADLAR")
 # Mostrar Gráfica.
 st.dataframe(df_cleaned)
 
@@ -26,6 +27,8 @@ st.dataframe(df_cleaned)
 # ----
 
 metadata = """
+
+Columnas del dataset de BONOS DE BADLAR
 
 Diferencia (diferencia)
 Días al vencimiento (dq)
@@ -40,7 +43,33 @@ Tasa interna de retorno (tir)
 Tasa total interna de retorno (ttir)
 Tasa única total interna de retorno (uptir)
 Volumen (volumen)
-Volumen total (vt)"""
+Volumen total (vt)
+
+
+"""
+
+
+
+
+
+
+with st.sidebar:
+    
+    st.title('🦙💬 Fin Chatbot')
+    st.write('This chatbot is created using the open-source LLM for Financial analysis')
+    if 'OPENAI_API_KEY' in st.secrets:
+        st.success('API key already provided!', icon='✅')
+        open_api = st.secrets['OPENAI_API_KEY']
+    else:
+        open_api = st.text_input('Enter Open API token:', type='password')
+        if not (open_api.startswith('r8_') and len(open_api)==40):
+            st.warning('Please enter your credentials!', icon='⚠️')
+        else:
+            st.success('Proceed to entering your prompt message!', icon='👉')
+    os.environ['OPENAI_API_KEY'] = open_api
+
+
+
 
 
 
