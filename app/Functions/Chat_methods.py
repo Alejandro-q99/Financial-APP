@@ -4,21 +4,11 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 import streamlit as st
+import toml
 
 
-
-
-
-# Construimos la ruta absoluta para que me saque las keys de la carpeta.
-env_path = Path('..') / '..' / 'keys' / '.env'
-
-# Set the path as environment variable
-os.environ['PATH'] = 'env_path'
-
-
-load_dotenv(dotenv_path=env_path.resolve())
-api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = api_key 
+secrets = toml.load("secrets.toml")
+api_key = secrets["default"]["OPENAI_API_KEY"]
 
 
 

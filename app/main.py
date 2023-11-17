@@ -45,7 +45,7 @@ Volumen total (vt)"""
 
 
 def main():
-    st.title("Chat Conversacional con OpenAI")
+    st.title("Financial AI Assistance")
 
     # Registro de mensajes de la conversación
     if 'message_log' not in st.session_state:
