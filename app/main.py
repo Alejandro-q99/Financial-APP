@@ -4,9 +4,16 @@ import pandas as pd
 import numpy as np
 from Functions import Processors as pr
 from Functions import Chat_methods as ch
-from datetime import datetime
+
 import os
-from Models import Assistant as assi
+from getpass import getpass
+import requests
+from langchain.document_loaders import PyPDFLoader, OnlinePDFLoader
+
+
+
+
+
 
 #read
 url = 'https://raw.githubusercontent.com/Alejandro-q99/Financial-APP/main/app/Data/bonos.csv'
@@ -26,92 +33,109 @@ st.dataframe(df_cleaned)
 
 # ----
 
-metadata = """
 
-Columnas del dataset de BONOS DE BADLAR
+st.title("Financial AI assistance")
 
-Diferencia (diferencia)
-Días al vencimiento (dq)
-Índice (indice)
-Margen de dispersión (md)
-Paridad (paridad)
-Precio de corte (pq)
-Precio (precio)
-Porcentaje de cobertura (qp)
-Ticker (ticker)
-Tasa interna de retorno (tir)
-Tasa total interna de retorno (ttir)
-Tasa única total interna de retorno (uptir)
-Volumen (volumen)
-Volumen total (vt)
-
-
-"""
+#OPENAI_API_KEY = getpass(password)
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 
 
+# ----- MODEL TRAINING
 
+st.cache_data
+def load_data():
+    urls = [
+        'https://arxiv.org/pdf/2306.06031v1.pdf',
+        'https://www.argentina.gob.ar/sites/default/files/informe_deuda_sostenible_2023-0304.pdf',
+        'https://www.argentina.gob.ar/sites/default/files/informe_cnv_6_act.pdf'
+    ]
 
-
-with st.sidebar:
+    ml_papers = []
     
-    st.title('🦙💬 Fin Chatbot')
-    st.write('This chatbot is created using the open-source LLM for Financial analysis')
-    if 'OPENAI_API_KEY' in st.secrets:
-        st.success('API key already provided!', icon='✅')
-        open_api = st.secrets['OPENAI_API_KEY']
-    else:
-        open_api = st.text_input('Enter Open API token:', type='password')
-        if not (open_api.startswith('r8_') and len(open_api)==40):
-            st.warning('Please enter your credentials!', icon='⚠️')
-        else:
-            st.success('Proceed to entering your prompt message!', icon='👉')
-    os.environ['OPENAI_API_KEY'] = open_api
+    for source in urls:
+        response = requests.get(source)
     
+    for i, url in enumerate(urls):
+        response = requests.get(url)
+        filename = f'app/Data/paper{i+1}.pdf'
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+            print(f'Descargado {filename}')
+
+            loader = PyPDFLoader(filename) # Clase de Lang chain
+            data = loader.load()
+            ml_papers.extend(data)
     
-    
-
-#Store LLM generated responses
-#if "messages" not in st.session_state.keys():
-#    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-
-# Display or clear chat messages
-#for message in st.session_state.messages:
-#    with st.chat_message(message["role"]):
-#        st.write(message["content"])
+    return ml_papers
 
 
-
-def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
-
+with st.spinner('Wait for it...'):
+    ml_papers = load_data()
+    st.success('Financial Knowledge Load!')
 
 
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1500,
+    chunk_overlap=200,
+    length_function=len
+    )
+
+documents = text_splitter.split_documents(ml_papers)
+
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+
+
+embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+
+vectorstore = Chroma.from_documents(
+    documents=documents,
+    embedding=embeddings
+)
+
+retriever = vectorstore.as_retriever(
+    search_kwargs={"k": 3}
+    )
+
+
+
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+
+chat = ChatOpenAI(
+    openai_api_key= OPENAI_API_KEY,
+    model_name='gpt-3.5-turbo',
+    temperature=0.0
+)
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=chat,
+    chain_type="stuff",
+    retriever=retriever
+)
+
+# ---------
+chat_history = []
+# Chat
+# Función para realizar una consulta y almacenar la conversación
+def ask_and_store(query):
+    # Ejecutar la consulta a través de la cadena de QA
+    response = qa_chain.run(query)
+
+    # Almacenar la consulta y la respuesta en el historial
+    chat_history.append({"query": query, "response": response})
+
+    return response
+
+
+
+query =  st.text_input("> ")
+c_response = ask_and_store(query)
+st.write(c_response)
 
 
 
 
-def main():
-    st.title("Financial AI Assistance")
-
-    # Registro de mensajes de la conversación
-    if 'message_log' not in st.session_state:
-        st.session_state['message_log'] = [{"role": "system", "content": f"You are a helpful assistant, with {metadata} and {df_cleaned} as reference"}]
-
-    # Campo de entrada para el mensaje del usuario
-    user_input = st.text_input("Preguntale por tus datos aquí!:")
-    
-    
-    
-    
-    # Botón de enviar
-    if st.button('Enviar'):
-        st.session_state['message_log'].append({"role": "user", "content": user_input})
-        #response = ch.send_message(st.session_state['message_log'])
-        response = assi.model_t5(st.session_state['message_log'])
-        st.session_state['message_log'].append({"role": "assistant", "content": response})
-        st.write(response)
-
-if __name__ == '__main__':
-    main()
