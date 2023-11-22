@@ -15,19 +15,17 @@ from langchain.document_loaders.csv_loader import CSVLoader
 
 
 #read
-url = 'https://raw.githubusercontent.com/Alejandro-q99/Financial-APP/main/app/Data/bonos.csv'
+url = 'https://raw.githubusercontent.com/Alejandro-q99/Financial-APP/main/app/Data/clean_financial_data.csv'
 df = pd.read_csv(url)
-#clean
-cleaned_data = pr.clean_and_convert_data(df)
-df_cleaned = cleaned_data
+
 
 #df_cleaned = cleaned_data.drop("diferencia", axis=1) Verificar utilidad de esta ci¿olumna
 
 
 
-st.title("BONOS TASA FIJA - BADLAR")
+st.title("BONOS DATA")
 # Mostrar Gráfica.
-st.dataframe(df_cleaned)
+st.dataframe(df)
 
 
 # ----
@@ -66,7 +64,26 @@ def load_data():
             data = loader.load()
             ml_papers.extend(data)
     
+    
+    # Data Tabular preprocesada.
+    tabular_data = load_tabular_data("./Data/clean_financial_data.csv")
+    ml_papers.extend(tabular_data)
+    
     return ml_papers
+
+
+def load_tabular_data(path):
+    loader = CSVLoader(
+    file_path=path,
+    csv_args={
+        "delimiter": ",",
+        "fieldnames": ["id","diferencia","dq","indice","md","paridad","pq","precio","qp","ticker","tir","ttir","uptir","volumen","vt"], 
+    },)
+    #Volver dinámico  el fieldnames para que parsee mejor el dataset que entre, es decir, que no sea columna dependiente. pd.read_csv().pd.columns
+    tabular_data = loader.load()
+    return tabular_data
+
+
 
 
 with st.spinner('Wait for it...'):
