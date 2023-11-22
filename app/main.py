@@ -5,11 +5,10 @@ import numpy as np
 from Functions import Processors as pr
 from Functions import Chat_methods as ch
 
-import os
-from getpass import getpass
+
 import requests
 from langchain.document_loaders import PyPDFLoader, OnlinePDFLoader
-
+from langchain.document_loaders.csv_loader import CSVLoader
 
 
 

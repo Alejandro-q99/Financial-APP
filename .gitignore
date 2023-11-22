@@ -1,3 +1,5 @@
 env/
 Assets/
 keys/
+.streamlit/
+garbage/
